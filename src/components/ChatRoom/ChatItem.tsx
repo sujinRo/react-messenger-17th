@@ -11,12 +11,19 @@ const Wrapper = styled.div`
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 7px;
 `;
 const ChatWrapper = styled.div`
   display: flex;
+  gap: 4px;
+  justify-content: ${({ isUser }: { isUser: boolean }) =>
+    isUser ? 'flex-end' : 'flex-start'};
+`;
+
+const CurrentTime = styled.div`
+  font-size: 10px;
+  display: flex;
   align-items: flex-end;
-  gap: 5px;
 `;
 const ChatValue = styled.div`
   background-color: ${({ isUser }: { isUser: boolean }) =>
@@ -24,6 +31,7 @@ const ChatValue = styled.div`
   padding: 10px;
   border-radius: 10px;
   word-break: break-all;
+  max-width: 75%;
 `;
 const Image = styled.img`
   width: 40px;
@@ -39,15 +47,20 @@ interface ChatItemProps {
 }
 
 function ChatItem({ chat, isUser, sender }: ChatItemProps) {
-  const hour = String(new Date(chat.date).getHours()).padStart(2, '0');
+  const hour = () => {  if(new Date(chat.date).getHours() < 12) {
+    return  '오전 ' + String(new Date(chat.date).getHours());
+  }
+  else{
+    return '오후 ' + String(new Date(chat.date).getHours() - 12);
+  }}
   const minute = String(new Date(chat.date).getMinutes()).padStart(2, '0');
   
   return (
     <Wrapper isUser={isUser}>
       {isUser ? (
         <>
-          <ChatWrapper>
-            {hour}:{minute}
+          <ChatWrapper isUser={isUser}>
+            <CurrentTime>{hour()}:{minute}</CurrentTime>
             <ChatValue isUser={true}>{chat.text}</ChatValue>
           </ChatWrapper>
         </>
@@ -56,9 +69,9 @@ function ChatItem({ chat, isUser, sender }: ChatItemProps) {
           <Image src={sender.image}></Image>
           <ContentWrapper>
             {sender.name}
-            <ChatWrapper>
+            <ChatWrapper isUser={isUser}>
               <ChatValue isUser={false}>{chat.text}</ChatValue>
-              {hour}:{minute}
+              <CurrentTime>{hour()}:{minute}</CurrentTime>
             </ChatWrapper>
           </ContentWrapper>
         </>

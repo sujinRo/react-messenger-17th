@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import Back from "../components/Bar/Back";
 import MenuBar from "../components/Bar/MenuBar";
@@ -115,17 +116,47 @@ function ChatRooms(){
   const me = userData.me;
   const all = me.concat(users);
 
-  const getDate = (chat: Chat[])=>{
-    const month = String(new Date(chat[chat.length -1].date).getMonth()).padStart(2, '0');
-    const day = String(new Date(chat[chat.length -1].date).getDay()).padStart(2, '0');
+  const [firstChats, setFirstChats] = useState<Chat[]>(chatRooms[0].chats);
+  const [secondChats, setSecondChats] = useState<Chat[]>(chatRooms[1].chats);
+  const [thirdChats, setThirdChats] = useState<Chat[]>(chatRooms[2].chats);
+  const [fourthChats, setFourthChats] = useState<Chat[]>(chatRooms[3].chats);
+  const [fifthChats, setFifthChats] = useState<Chat[]>(chatRooms[4].chats);
+  const [sixthChats, setSixthChats] = useState<Chat[]>(chatRooms[5].chats);
+
+  useEffect(() => { 
+    const firstChat = localStorage.getItem('0');
+    const secondChat = localStorage.getItem('1');
+    const thirdChat = localStorage.getItem('2');
+    const fourthChat = localStorage.getItem('3');
+    const fifthChat = localStorage.getItem('4');
+    const sixthChat = localStorage.getItem('5');
+
+    if(firstChat){
+      setFirstChats(JSON.parse(firstChat));
+    }
+    if(secondChat){
+      setSecondChats(JSON.parse(secondChat));
+    }
+    if(thirdChat){
+      setThirdChats(JSON.parse(thirdChat));
+    }
+    if(fourthChat){
+      setFourthChats(JSON.parse(fourthChat));
+    }
+    if(fifthChat){
+      setFifthChats(JSON.parse(fifthChat));
+    }
+    if(sixthChat){
+      setSixthChats(JSON.parse(sixthChat));
+    }
+
+  }, []);
+  
+  const getDate = (date: any)=>{
+    const month = String(new Date(date).getMonth()).padStart(2, '0');
+    const day = String(new Date(date).getDay()).padStart(2, '0');
 
     return month + "월 " + day + "일";
-  }
-
-  const getContent = (chat: Chat[])=>{
-    const content = chat[chat.length -1].text;
-
-    return content;
   }
 
   const getRoomMember=(roomId: number, isCurUser: Boolean)=>{
@@ -136,7 +167,27 @@ function ChatRooms(){
     }
     return roomMember;
   }
-  
+
+  const getLastMsg= (roomId: number) => {
+    if (roomId === 0) {
+       return firstChats[firstChats.length -1];
+    }
+    if (roomId === 1) {
+       return secondChats[secondChats.length -1];
+    }
+    if (roomId === 2) {
+      return thirdChats[thirdChats.length -1];
+    }
+    if (roomId === 3) {
+      return fourthChats[fourthChats.length -1];
+    }
+    if (roomId === 4) {
+      return fifthChats[fifthChats.length -1];
+    }
+    if (roomId === 5) {
+      return sixthChats[sixthChats.length -1];
+    }
+  }
 
     return(
         <Wrapper>
@@ -159,11 +210,11 @@ function ChatRooms(){
                   {member.name}
                   </Name>
                   <Day>
-                  {getDate(room.chats)}
+                  {getDate(getLastMsg(room.roomId)?.date)}
                   </Day>
                   </Title>
                   <Text>
-                  {getContent(room.chats)}
+                  {getLastMsg(room.roomId)?.text}
                   </Text>
                   </All>
                   </>

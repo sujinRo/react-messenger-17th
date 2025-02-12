@@ -46,15 +46,15 @@ interface ChatInputProps {
 function ChatInput({ addChat }: ChatInputProps) {
   const [value, setValue] = useState('');
 
-  const onChange = useCallback(
+  const onChange = useCallback( //useCallback: 특정함수 재사용에 사용 _ component에서 props가 바뀌지 않았으면 virtual dom에 새로 렌더링하지 않고 컴포넌트의 결과물 재사용
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       setValue(e.target.value);
     },
     [value]
   );
 
-  const onSubmit = (e?: React.FormEvent<HTMLFormElement>) => {
-    if (value.trim() == '') {
+  const onSubmit = (e?: React.FormEvent) => {
+    if (value.trim() === '') {
       e?.preventDefault();
       return;
     }

@@ -28,6 +28,7 @@ interface ChatListProps {
 
 function ChatList({ userId, chats, users}: ChatListProps) {
   const chatListRef = useRef<HTMLDivElement>(null);
+  
   useEffect(() => {
     chatListRef.current?.scrollTo(0, chatListRef.current.scrollHeight);
   }, [chats]);

@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Chat } from '../interfaces/Interface';
 import chatData from '../jsons/chatData.json';
 import userData from '../jsons/userData.json';
@@ -24,16 +24,45 @@ const Wrapper = styled.div`
 function ChatRoom() {
   const {id} = useParams<string>();
   const roomId: number = parseInt(id!);
-
+  const chatRooms = chatData.chatRooms;
   const curRoom = chatData.chatRooms[roomId];
-  const [chats, setChats] = useState<Chat[]>(curRoom.chats);
+
+  const [nextChatId, setNextChatId] = useState<number>(0);
+  const [localChats, setLocalChats] = useState<Chat[]>([]);
   const [userId, setUserId] = useState(0);
   
-  const nextChatId = useRef(chats.length + 1);
   const users = userData.users;
   const me = userData.me;
   const all = me.concat(users);
-  const chatRooms = chatData.chatRooms;
+  
+  useEffect(() => { 
+    const localChat = localStorage.getItem(`${roomId}`);
+    if(localChat){
+      setLocalChats(JSON.parse(localChat));
+    }
+    else{
+      localStorage.setItem(`${roomId}`, JSON.stringify(curRoom.chats)); //localstorage에 고정된 값 넣기!
+    }
+
+  }, [nextChatId]);
+
+  const addChat = useCallback(
+    (text: string) => {
+      const chat = {
+        id: nextChatId,
+        userId: userId,
+        text,
+        date: String(new Date()),
+      };
+      
+      const prevChats = JSON.parse(localStorage.getItem(`${roomId}`) || '[]');
+      const updatedChats = [...prevChats, chat];
+
+      localStorage.setItem(`${roomId}`, JSON.stringify(updatedChats));
+      setNextChatId(nextChatId+1);//이렇게 해야 타자를 치자마자 나옴 _ 이유: localstorage에서 getItem을 해오면 한 박자씩 느린데, useState 값은 바로바로 나옴. 그래서, nextChatID를 useEffect의 의존성으로 해주면 채팅이 화면에 바로 나오게됨.
+    },
+    [nextChatId, userId] //userId를 해줘야 userId에 따라 분리가 됨
+  );
 
   const getRoomMember=(roomId: number, isCurUser: Boolean)=>{
     const roomMember: User[] = [];
@@ -41,23 +70,8 @@ function ChatRoom() {
     if(!isCurUser){
       roomMember.shift();
     }
-    console.log(roomMember);
     return roomMember;
   }
- 
-  const addChat = useCallback(
-    (text: string) => {
-      const chat = {
-        id: nextChatId.current,
-        userId: userId,
-        text,
-        date: String(new Date()),
-      };
-      setChats(chats.concat(chat));
-      nextChatId.current++;
-    },
-    [chats, userId]
-  );
 
   const changeUser = (id: number) => {
     setUserId(id);
@@ -68,7 +82,7 @@ function ChatRoom() {
   return (
     <Wrapper>
       <UserList userId={userId} users={roomMember} changeUser={changeUser} />
-      <ChatList userId={userId} users={all} chats={chats} />
+      <ChatList userId={userId} users={all} chats={localChats}/>
       <ChatInput addChat={addChat} />
     </Wrapper>
   );
