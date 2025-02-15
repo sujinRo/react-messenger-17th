@@ -54,7 +54,6 @@ function ChatItem({ chat, isUser, sender }: ChatItemProps) {
     return '오후 ' + String(new Date(chat.date).getHours() - 12);
   }}
   const minute = String(new Date(chat.date).getMinutes()).padStart(2, '0');
-  
   return (
     <Wrapper isUser={isUser}>
       {isUser ? (
