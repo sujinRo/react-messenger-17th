@@ -116,47 +116,22 @@ function ChatRooms(){
   const me = userData.me;
   const all = me.concat(users);
 
-  const [firstChats, setFirstChats] = useState<Chat[]>(chatRooms[0].chats);
-  const [secondChats, setSecondChats] = useState<Chat[]>(chatRooms[1].chats);
-  const [thirdChats, setThirdChats] = useState<Chat[]>(chatRooms[2].chats);
-  const [fourthChats, setFourthChats] = useState<Chat[]>(chatRooms[3].chats);
-  const [fifthChats, setFifthChats] = useState<Chat[]>(chatRooms[4].chats);
-  const [sixthChats, setSixthChats] = useState<Chat[]>(chatRooms[5].chats);
+  const getYear = (date: any)=>{
+    const year = String(new Date(date).getFullYear());
 
-  useEffect(() => { 
-    const firstChat = localStorage.getItem('0');
-    const secondChat = localStorage.getItem('1');
-    const thirdChat = localStorage.getItem('2');
-    const fourthChat = localStorage.getItem('3');
-    const fifthChat = localStorage.getItem('4');
-    const sixthChat = localStorage.getItem('5');
+    return year;
+  }
 
-    if(firstChat){
-      setFirstChats(JSON.parse(firstChat));
-    }
-    if(secondChat){
-      setSecondChats(JSON.parse(secondChat));
-    }
-    if(thirdChat){
-      setThirdChats(JSON.parse(thirdChat));
-    }
-    if(fourthChat){
-      setFourthChats(JSON.parse(fourthChat));
-    }
-    if(fifthChat){
-      setFifthChats(JSON.parse(fifthChat));
-    }
-    if(sixthChat){
-      setSixthChats(JSON.parse(sixthChat));
-    }
+  const getMonth = (date: any)=>{
+    const month = String(new Date(date).getMonth() + 1).padStart(2, '0');
 
-  }, []);
-  
-  const getDate = (date: any)=>{
-    const month = String(new Date(date).getMonth()).padStart(2, '0');
-    const day = String(new Date(date).getDay()).padStart(2, '0');
+    return month;
+  }
 
-    return month + "월 " + day + "일";
+  const getDay = (date: any)=>{
+    const day = String(new Date(date).getDate()).padStart(2, '0');
+
+    return day;
   }
 
   const getRoomMember=(roomId: number, isCurUser: Boolean)=>{
@@ -168,27 +143,6 @@ function ChatRooms(){
     return roomMember;
   }
 
-  const getLastMsg= (roomId: number) => {
-    if (roomId === 0) {
-       return firstChats[firstChats.length -1];
-    }
-    if (roomId === 1) {
-       return secondChats[secondChats.length -1];
-    }
-    if (roomId === 2) {
-      return thirdChats[thirdChats.length -1];
-    }
-    if (roomId === 3) {
-      return fourthChats[fourthChats.length -1];
-    }
-    if (roomId === 4) {
-      return fifthChats[fifthChats.length -1];
-    }
-    if (roomId === 5) {
-      return sixthChats[sixthChats.length -1];
-    }
-  }
-
     return(
         <Wrapper>
           <Bar>
@@ -196,7 +150,38 @@ function ChatRooms(){
           <h2 style={{fontSize: '20px', fontWeight: 1000,  margin:0, marginLeft:'10px'}}>My Chats</h2>
           </Bar>
           <Contents>
-            {chatRooms.map((room) => (
+            {chatRooms.map((room) => {
+              let chats = chatRooms[room.roomId].chats;
+              const storedChat = localStorage.getItem(`${room.roomId}`)
+              
+              if(storedChat){
+                chats = JSON.parse(storedChat);
+              }
+
+              const getSendTIme = () => {
+                const date = chats[chats.length - 1]?.date
+
+                if(getYear(date) + '-' + getMonth(date) + '-' + getDay(date) === getYear(String(new Date())) + '-' + getMonth(String(new Date())) + '-' + getDay(String(new Date()))){
+                  const hour = () => {  
+                    if(new Date(date).getHours() < 12) {
+                    return  '오전 ' + String(new Date(date).getHours());
+                  }
+                  else{
+                    return '오후 ' + String(new Date(date).getHours() - 12);
+                  }}
+                  
+                  const minute = String(new Date(date).getMinutes()).padStart(2, '0');
+                  return hour() + ':' + minute;
+                }
+                else if(getYear(date) + '-' + getMonth(date) === getYear(String(new Date())) + '-' + getMonth(String(new Date()))){
+                  return '어제';
+                }
+                else{
+                  return getYear(date) + '-' + getMonth(date) + '-' + getDay(date);
+                }
+              }
+    
+              return(
               <Link to = {`/Chat/${room.roomId}`} style={{textDecoration: 'none', color: 'inherit'}}>
                 <Content>
                   {getRoomMember(room.roomId, false).map((member) => (
@@ -210,11 +195,11 @@ function ChatRooms(){
                   {member.name}
                   </Name>
                   <Day>
-                  {getDate(getLastMsg(room.roomId)?.date)}
+                  {getSendTIme()}
                   </Day>
                   </Title>
                   <Text>
-                  {getLastMsg(room.roomId)?.text}
+                  {chats[chats.length - 1]?.text}
                   </Text>
                   </All>
                   </>
@@ -222,7 +207,7 @@ function ChatRooms(){
           </Content>
           <Line/>
               </Link>
-            ))}
+            )})}
           </Contents>
           <MenuBar/>
         </Wrapper>
