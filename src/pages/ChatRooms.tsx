@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
 import styled from "styled-components";
 import Back from "../components/Bar/Back";
 import MenuBar from "../components/Bar/MenuBar";
 import chatData from "../jsons/chatData.json";
 import userData from "../jsons/userData.json";
-import {User, Chat} from "../interfaces/Interface";
+import {User} from "../interfaces/Interface";
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 
 const Wrapper = styled.div`
   display: flex;
@@ -112,25 +112,23 @@ font-size: 13px;
 
 function ChatRooms(){
   const chatRooms = chatData.chatRooms;
+
   const users = userData.users;
   const me = userData.me;
   const all = me.concat(users);
 
   const getYear = (date: any)=>{
     const year = String(new Date(date).getFullYear());
-
     return year;
   }
 
   const getMonth = (date: any)=>{
     const month = String(new Date(date).getMonth() + 1).padStart(2, '0');
-
     return month;
   }
 
   const getDay = (date: any)=>{
     const day = String(new Date(date).getDate()).padStart(2, '0');
-
     return day;
   }
 
@@ -161,7 +159,7 @@ function ChatRooms(){
               const getSendTIme = () => {
                 const date = chats[chats.length - 1]?.date
 
-                if(getYear(date) + '-' + getMonth(date) + '-' + getDay(date) === getYear(String(new Date())) + '-' + getMonth(String(new Date())) + '-' + getDay(String(new Date()))){
+                if(getYear(date) + '-' + getMonth(date) + '-' + getDay(date)  === getYear(String(new Date())) + '-' + getMonth(String(new Date())) + '-' + getDay(String(new Date()))){
                   const hour = () => {  
                     if(new Date(date).getHours() < 12) {
                     return  '오전 ' + String(new Date(date).getHours());
@@ -173,7 +171,7 @@ function ChatRooms(){
                   const minute = String(new Date(date).getMinutes()).padStart(2, '0');
                   return hour() + ':' + minute;
                 }
-                else if(getYear(date) + '-' + getMonth(date) === getYear(String(new Date())) + '-' + getMonth(String(new Date()))){
+                else if(getYear(date) + '-' + getMonth(date) + '-' + getDay(date) === getYear(String(new Date())) + '-' + getMonth(String(new Date())) + '-' + String((new Date().getDate() - 1)).padStart(2, '0')){
                   return '어제';
                 }
                 else{

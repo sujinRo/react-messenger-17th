@@ -42,6 +42,7 @@ function ChatRoom() {
     }
     else{
       localStorage.setItem(`${roomId}`, JSON.stringify(curRoom.chats)); //localstorage에 고정된 값 넣기!
+      setLocalChats(curRoom.chats);
     }
 
   }, [nextChatId]);
@@ -61,7 +62,7 @@ function ChatRoom() {
       localStorage.setItem(`${roomId}`, JSON.stringify(updatedChats));
       setNextChatId(nextChatId+1);//이렇게 해야 타자를 치자마자 나옴 _ 이유: localstorage에서 getItem을 해오면 한 박자씩 느린데, useState 값은 바로바로 나옴. 그래서, nextChatID를 useEffect의 의존성으로 해주면 채팅이 화면에 바로 나오게됨.
     },
-    [nextChatId, userId] //userId를 해줘야 userId에 따라 분리가 됨
+    [nextChatId, userId, roomId] //userId를 해줘야 userId에 따라 분리가 됨
   );
 
   const getRoomMember=(roomId: number, isCurUser: Boolean)=>{
@@ -77,11 +78,9 @@ function ChatRoom() {
     setUserId(id);
   };
 
-  const roomMember = getRoomMember(roomId, true);
-
   return (
     <Wrapper>
-      <UserList userId={userId} users={roomMember} changeUser={changeUser} />
+      <UserList userId={userId} users={getRoomMember(roomId, true)} changeUser={changeUser} />
       <ChatList userId={userId} users={all} chats={localChats}/>
       <ChatInput addChat={addChat} />
     </Wrapper>
