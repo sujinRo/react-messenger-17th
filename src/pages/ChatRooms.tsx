@@ -3,9 +3,9 @@ import Back from "../components/Bar/Back";
 import MenuBar from "../components/Bar/MenuBar";
 import chatData from "../jsons/chatData.json";
 import userData from "../jsons/userData.json";
-import {User} from "../interfaces/Interface";
+import {SortChat, User} from "../interfaces/Interface";
 import { Link } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const Wrapper = styled.div`
   display: flex;
@@ -112,10 +112,39 @@ font-size: 13px;
 
 function ChatRooms(){
   const chatRooms = chatData.chatRooms;
-
+  const [lastChat, setLastChat] = useState<SortChat[]>(chatData.chatRooms.map((room) => (
+    {
+      roomId: room.roomId, 
+      id: room.chats[room.chats.length - 1].id, 
+      userId: room.chats[room.chats.length - 1].userId, 
+      text: room.chats[room.chats.length - 1].text, 
+      date: room.chats[room.chats.length - 1].date,
+    }
+  )));
+  
   const users = userData.users;
   const me = userData.me;
   const all = me.concat(users);
+
+  useEffect(() => {
+    const updatedChat = [...lastChat]
+    for(let i = 0; i < chatData.chatRooms.length; i++){
+      const localData = localStorage.getItem(`${i}`);
+      if(localData){
+        const localChat = JSON.parse(localData);
+        updatedChat[i] = {
+          roomId: lastChat[i].roomId,
+          id: localChat[localChat.length - 1].id,
+          userId: localChat[localChat.length - 1].userId,
+          text: localChat[localChat.length - 1].text,
+          date: localChat[localChat.length - 1].date,
+        };
+        
+      } 
+    }
+    const sortedChat = updatedChat.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    setLastChat(sortedChat);
+  },[]);
 
   const getYear = (date: any)=>{
     const year = String(new Date(date).getFullYear());
@@ -132,12 +161,12 @@ function ChatRooms(){
     return day;
   }
 
-  const getRoomMember=(roomId: number, isCurUser: Boolean)=>{
+  const getRoomMember=(roomId: number)=>{
     const roomMember: User[] = [];
     chatRooms[roomId].users.map((memberId) => roomMember.push(all[memberId]));
-    if(!isCurUser){
-      roomMember.shift();
-    }
+
+    roomMember.shift();
+    
     return roomMember;
   }
 
@@ -148,16 +177,9 @@ function ChatRooms(){
           <h2 style={{fontSize: '20px', fontWeight: 1000,  margin:0, marginLeft:'10px'}}>My Chats</h2>
           </Bar>
           <Contents>
-            {chatRooms.map((room) => {
-              let chats = chatRooms[room.roomId].chats;
-              const storedChat = localStorage.getItem(`${room.roomId}`)
-              
-              if(storedChat){
-                chats = JSON.parse(storedChat);
-              }
-
+            {lastChat.map((chat) => {
               const getSendTIme = () => {
-                const date = chats[chats.length - 1]?.date
+                const date = chat.date
 
                 if(getYear(date) + '-' + getMonth(date) + '-' + getDay(date)  === getYear(String(new Date())) + '-' + getMonth(String(new Date())) + '-' + getDay(String(new Date()))){
                   const hour = () => {  
@@ -180,9 +202,9 @@ function ChatRooms(){
               }
     
               return(
-              <Link to = {`/Chat/${room.roomId}`} style={{textDecoration: 'none', color: 'inherit'}}>
+              <Link to = {`/Chat/${chat.roomId}`} style={{textDecoration: 'none', color: 'inherit'}}>
                 <Content>
-                  {getRoomMember(room.roomId, false).map((member) => (
+                  {getRoomMember(chat.roomId).map((member) => (
                   <>
                   <Circle>
                   <Image src={member.image}></Image>
@@ -197,7 +219,7 @@ function ChatRooms(){
                   </Day>
                   </Title>
                   <Text>
-                  {chats[chats.length - 1]?.text}
+                  {chat.text}
                   </Text>
                   </All>
                   </>
