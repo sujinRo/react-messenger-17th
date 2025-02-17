@@ -3,22 +3,17 @@ import ChatRoom from './pages/ChatRoom';
 import ChatRooms from './pages/ChatRooms';
 import ListPage from './pages/ListPage';
 import Setting from './pages/Setting';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { RecoilRoot } from 'recoil';
+import { Routes, Route } from 'react-router-dom';
 
 function App() {
   return (
-    <RecoilRoot>
-      <BrowserRouter>
       <Routes>
-        <Route path="/" Component={MainPage} />
-        <Route path='/Chat' Component={ChatRooms} />
-        <Route path='/Chat/:id' Component={ChatRoom} />
-        <Route path='/List' Component={ListPage} />
-        <Route path='/Setting' Component={Setting}/>
+        <Route path="/" element={<MainPage />} />
+        <Route path='/Chat' element={<ChatRooms/>} />
+        <Route path='/Chat/:id' element={<ChatRoom/>} />
+        <Route path='/List' element={<ListPage/>} />
+        <Route path='/Setting' element={<Setting/>}/>
       </Routes>
-      </BrowserRouter>
-    </RecoilRoot>
   );
 }
 

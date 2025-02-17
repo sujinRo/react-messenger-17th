@@ -4,7 +4,7 @@ import MenuBar from "../components/Bar/MenuBar";
 import chatData from "../jsons/chatData.json";
 import userData from "../jsons/userData.json";
 import {SortChat, User} from "../interfaces/Interface";
-import { Link } from "react-router-dom";
+import { Outlet, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 const Wrapper = styled.div`

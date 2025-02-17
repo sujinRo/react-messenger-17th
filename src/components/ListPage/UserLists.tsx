@@ -1,4 +1,4 @@
-import {useState, useRef, useEffect} from 'react';
+import {useState} from 'react';
 import {User} from '../../interfaces/Interface'
 import styled from 'styled-components';
 import ModalPage from './ModalPage';
@@ -56,19 +56,20 @@ display:flex;
 interface UserListsProps{
     userId: number;
     users: User[];
+    isSearch: boolean;
 }
 
-function UserLists({userId, users}: UserListsProps){
+function UserLists({userId, users, isSearch}: UserListsProps){
   const [modalOpen,setModalOpen] = useState<boolean>(false);
   const [userIds, setUserIds] = useState(userId);
   const user = userData.users;
 
   const showModal = (id: number) => {
     setModalOpen(true);
-    if(users == user){
-    setUserIds(id-1);}
+    if(users == user || isSearch){
+    setUserIds(id-1);} //friends 용
     else{
-    setUserIds(id);
+    setUserIds(id); //me 용
     }
   }
   
@@ -89,7 +90,7 @@ function UserLists({userId, users}: UserListsProps){
             </>
         ))} 
         </Wrapper>
-      {modalOpen && <ModalPage userId={userIds} users={users[userIds]} setModalOpen={setModalOpen}/>} 
+      {modalOpen && <ModalPage users={users[userIds]} setModalOpen={setModalOpen}/>} 
       </>
     );
 }

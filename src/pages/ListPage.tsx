@@ -4,7 +4,6 @@ import MenuBar from "../components/Bar/MenuBar";
 import Back from "../components/Bar/Back";
 import userData from '../jsons/userData.json';
 import UserLists from "../components/ListPage/UserLists";
-import UserListsS from '../components/ListPage/UserListsS';
 import {GoSearch} from "react-icons/go"
 import {FiX} from 'react-icons/fi'
 
@@ -50,23 +49,20 @@ overflow: auto;
 
 const SubTitle = styled.div`
 display: flex;
-margin: 20px;
+margin: 20px 13px;
 margin-bottom: 0;
 font-size: 19px;
 font-weight: 1000;
-`;
-
-const Line = styled.hr`
-display: flex;
-justify-content: center;
-border: 0.01px solid lightgrey;
-width: 320px;
+border-bottom: 2px solid lightgrey;
+padding: 5px 5px;
 `;
 
 const SearchInput = styled.input`
 height: 28px;
 border-radius: 30px;
 border: 2px solid lightgray;
+outline: none;
+padding: 0 10px;
 outline: none;
 `;
 
@@ -96,7 +92,7 @@ const XStyle = {
 function ListPage(){
   const users = userData.users;
   const me = userData.me;
-  const [userId, setUserId] = useState<number>(0);
+  const userId = 0;
   const [visible, setVisible] = useState<boolean>(true);
   const [content, setContent] = useState("");
 
@@ -125,11 +121,9 @@ function ListPage(){
           {visible?
           <>
           <SubTitle>me</SubTitle>
-          <Line/>
-          <UserLists userId={userId} users={me}/>
+          <UserLists userId={userId} users={me} isSearch={false}/>
           <SubTitle>friends</SubTitle>
-          <Line/>
-          <UserLists userId={userId} users={users}/>
+          <UserLists userId={userId} users={users} isSearch={false}/>
           </>
           :
           <>
@@ -138,8 +132,7 @@ function ListPage(){
           <FiX style={XStyle} onClick={onClick}/>
           </SearchBar>
           <SubTitle>Searching...</SubTitle>
-          <Line/>
-          {filterFriend.map( (user)=> <UserListsS userId={user.id} users={users[user.id - 1]}/>)}
+          <UserLists userId={userId} users={filterFriend} isSearch={true}/>
           </>
         }
           </Content>

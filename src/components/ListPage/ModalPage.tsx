@@ -37,32 +37,31 @@ align-items: center;
 `;
 
 interface ModalProps{
-    userId: number;
     users: User;
     setModalOpen: any;
 }
 
-function ModalPage({userId, users, setModalOpen}: ModalProps){
+function ModalPage({users, setModalOpen}: ModalProps){
     const modalRef = useRef<HTMLDivElement>(null);
     
-    useEffect(() => {
+    useEffect(() => { //컴포넌트 렌더링 후 실행_즉, 모달 외부 클릭 시, 모달 닫힘
         const handler = (event: React.BaseSyntheticEvent | MouseEvent) => {
-            if (modalRef.current && !modalRef.current.contains(event.target)) {
+            if (modalRef.current && !modalRef.current.contains(event.target)) { //modalRef.current.contains(event.target): 모달 창 내부 _ 즉, 외부 누를 시, 창 닫음
                 setModalOpen(false);
             }
         };
-        document.addEventListener('mousedown', handler);
+        document.addEventListener('mousedown', handler); // 마우스 클릭 시, handler 실행
         
         return () => {
-            document.removeEventListener('mousedown', handler);
+            document.removeEventListener('mousedown', handler); //useEffect 재 실행 전 listener 정리
         };
     });
 
     return(
         <Background>
             <Content ref={modalRef}>
-            <Image src={users.image}></Image>  
-            <Text>{users.contents}</Text>
+            <Image src={users?.image}></Image>  
+            <Text>{users?.contents}</Text>
             </Content>
         </Background>
     );
